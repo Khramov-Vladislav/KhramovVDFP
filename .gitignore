@@ -310,3 +310,6 @@ __pycache__/
 # IDE специфичные файлы
 .history/
 .ionide/
+
+lecture*/
+*.pdf
