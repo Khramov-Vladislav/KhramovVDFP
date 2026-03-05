@@ -74,17 +74,49 @@ myUnzip ((a, b):xs) =
     let (listA, listB) = myUnzip xs
     in (a : listA, b : listB)
 
-myUnzip :: [(a,b)] -> ([a],[b]) 
-myUnzip xs = (map fst xs, map snd xs)
+myUnzip' :: [(a,b)] -> ([a],[b]) 
+myUnzip' xs = (map fst xs, map snd xs)
 --------------------------------------------------------------------
+
+myFilter :: (a -> Bool) -> [a] -> [a]
+myFilter _ [] = []
+myFilter pred (x : xs ) =
+    if pred x
+    then x : myFilter pred xs
+    else myFilter pred xs
+
+myFilter' :: (a -> Bool) -> [a] -> [a]
+myFilter' _ [] = []
+myFilter' pred (x : xs)
+    | pred x = x : myFilter' pred xs 
+    | otherwise = myFilter' pred xs
 
 myMap :: (a -> b) -> [a] -> [b]
 myMap _ [] = []
 myMap f (x : xs) = f x : myMap f xs
 
-
 myZipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
--- myZipWith _ [] _
+myZipWith f [] ys = []
 myZipWith f xs [] = []
 myZipWith f (x:xs) (y:ys) = f x y : myZipWith f xs ys 
 
+myZipWith3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
+myZipWith3 f xs ys [] = []
+myZipWith3 f xs [] zs = []
+myZipWith3 f [] ys zs = []
+myZipWith3 f (x:xs) (y:ys) (z:zs) = f x y z : myZipWith3 f xs ys zs
+
+myAll :: (a -> Bool) -> [a] -> Bool
+myAll _ [] = True
+myAll pred (x : xs) 
+    | pred x = myAll pred xs
+    | otherwise = False
+
+myAny :: (a -> Bool) -> [a] -> Bool
+myAny _ [] = False
+myAny pred (x : xs)
+    | pred x = True
+    | otherwise  = myAny pred xs
+
+myComposition :: (b -> c) -> (a -> b) -> (a -> c)
+myComposition f g x = f (g x)
