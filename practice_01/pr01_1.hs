@@ -29,12 +29,54 @@ module Pr01_1 where
 
 -}
 
--- [1, 2, 3, 4] [5, 6, 7, 8, 9] -> [(1,5),(2,6),(3,7),(4,8)]
+myHead :: [a] -> a
+myHead [] = error "empty list"
+myHead (x : xs) = x
+
+myTail :: [a] -> [a]
+myTail [] = error "empty list"
+myTail (x : xs) = xs
+
+myTake :: Int -> [a] -> [a]
+myTake n [] = []
+myTake n (x : xs) = 
+    if n <= 0
+    then []
+    else x : myTake (n-1) xs
+
+myDrop :: Int -> [a] -> [a]
+myDrop n [] = []
+myDrop n (x : xs) = 
+    if n <= 0
+    then x : xs
+    else myDrop (n-1) xs
+
+myProduct :: Num a => [a] -> a
+myProduct [] = 1
+myProduct (x : xs) = x * myProduct xs
 
 myZip :: [a] -> [b] -> [(a, b)]
 myZip [] xs = []
 myZip xs [] = []
 myZip (x : xs) (y : ys) = (x, y) : myZip xs ys
+
+myZip3 :: [a] -> [b] -> [c] -> [(a, b, c)]
+myZip3 xs ys [] = []
+myZip3 xs [] zs = []
+myZip3 [] ys zs = []
+myZip3 (x : xs) (y : ys) (z : zs) = (x, y, z) : myZip3 xs ys zs
+
+--------------------------------------------------------------------
+-- сделано с использованием GPT‑5 mini.
+myUnzip :: [(a, b)] -> ([a], [b])
+myUnzip [] = ([], [])
+myUnzip ((a, b):xs) = 
+    let (listA, listB) = myUnzip xs
+    in (a : listA, b : listB)
+
+myUnzip :: [(a,b)] -> ([a],[b]) 
+myUnzip xs = (map fst xs, map snd xs)
+--------------------------------------------------------------------
 
 myMap :: (a -> b) -> [a] -> [b]
 myMap _ [] = []
@@ -42,7 +84,7 @@ myMap f (x : xs) = f x : myMap f xs
 
 
 myZipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
-myZipWith _ [] _
+-- myZipWith _ [] _
 myZipWith f xs [] = []
 myZipWith f (x:xs) (y:ys) = f x y : myZipWith f xs ys 
 
