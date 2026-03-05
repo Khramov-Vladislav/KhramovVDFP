@@ -28,6 +28,14 @@ module Pr01_1 where
 -- myComposition - композиция двух функций (.)
 
 -}
+myFST :: (a, b) -> a
+myFST (a, b) = a
+
+mySND :: (a, b) -> b
+mySND (a, b) = b
+
+myTHRD :: (a, b, c) ->  c
+myTHRD (a, b, c) = c
 
 myHead :: [a] -> a
 myHead [] = error "empty list"
