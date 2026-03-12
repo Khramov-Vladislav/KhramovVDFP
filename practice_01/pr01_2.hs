@@ -80,10 +80,29 @@ mySpan' f (x : xs) = (head, tail)
 -- сделано с использованием GPT‑5 mini.
 
 mySpan :: (a -> Bool) -> [a] -> ([a], [a])
-mySpan _ [] = ([], [])
 mySpan f = foldr step ([], [])
     where 
         step x (head, tail)
             | f x = (x : head, tail)
             | otherwise = ([], x : head ++ tail)
+-----------------------------------------------
+
+myMaybe :: b -> (a -> b) -> Maybe a -> b
+myMaybe defVal f Nothing = defVal
+myMaybe defVal f (Just x) = f x
+
+data MyList a = MyEmpty | MyCons a (MyList a)
+
+myMap :: (a -> b) -> MyList a -> MyList b
+myMap _ MyEmpty = MyEmpty
+myMap f (MyCons x xs) = MyCons (f x) (myMap f xs)
+
+-----------------------------------------------
+-- сделано с использованием GPT‑5 mini.
+
+myUnFoldr :: (b -> Maybe (a, b)) -> b -> [a]
+myUnFoldr f start =
+    case f seed of
+        Nothing -> []
+        Just (x, newSeed) -> x : myUnFoldr f newSeed
 -----------------------------------------------
