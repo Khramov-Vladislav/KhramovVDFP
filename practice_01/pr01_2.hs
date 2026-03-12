@@ -101,8 +101,100 @@ myMap f (MyCons x xs) = MyCons (f x) (myMap f xs)
 -- сделано с использованием GPT‑5 mini.
 
 myUnFoldr :: (b -> Maybe (a, b)) -> b -> [a]
-myUnFoldr f start =
+myUnFoldr f seed =
     case f seed of
         Nothing -> []
         Just (x, newSeed) -> x : myUnFoldr f newSeed
+-----------------------------------------------
+    
+-- Расширьте типы для выпекания тортов из материалов лекции:
+-- Добавить возможность испечь не менее трех типов тортов
+-- Контроль числа и объема используемых ингредиентов
+-- Обработку недостатка или отсутствия ингредиентов
+
+data CakeType = Cheesecake | Strawberrycake | Carrotcake 
+    deriving Show
+data Ingredients = Oil | Egg | Flour | Sugar | BakingPowder | Curd | Cream | CreamCheese | Strawberry | Carrot | Walnut 
+    deriving (Eq, Show)
+data Ingredient = Ingredient Ingredients Int
+    deriving Show
+data Cake = Cake CakeType 
+    deriving Show
+
+-----------------------------------------------
+-- сделано с использованием GPT‑5 mini.
+recipe :: CakeType -> [Ingredient]
+recipe Cheesecake = [Ingredient Curd 200, Ingredient Egg 3, Ingredient Flour 100, Ingredient Sugar 150, Ingredient Cream 50]
+recipe Strawberrycake = [Ingredient Flour 100, Ingredient Egg 3, Ingredient Sugar 100, Ingredient Strawberry 150, Ingredient Cream 50]
+recipe Carrotcake = [Ingredient Flour 120, Ingredient Egg 3, Ingredient Sugar 100, Ingredient Carrot 200, Ingredient Walnut 50]
+-----------------------------------------------
+
+enough :: Ingredient -> [Ingredient] -> Bool
+enough _ [] = False
+enough (Ingredient ing1 n1) (Ingredient ing2 n2 : xs) 
+    | ing1 == ing2 && n1 <= n2 = True
+    | otherwise = enough (Ingredient ing1 n1) xs
+
+canMakeCake :: [Ingredient] -> [Ingredient] -> Bool
+canMakeCake [] ingredient = True
+canMakeCake need [] = False
+canMakeCake (x:need) ingredient
+    | enough x ingredient = canMakeCake need ingredient
+    | otherwise = False
+
+-- bakeCake :: CakeType -> [Ingredient] -> Maybe Cake
+-- bakeCake cakeType ingredient 
+--     | canMakeCake need ingredient = Just (Cake cakeType) 
+--     | otherwise = Nothing
+--         where  need = recipe cakeType
+
+-- bakeCakes :: [(CakeType, [Ingredient])] -> [Cake]
+-- bakeCakes [] = []
+-- bakeCakes ((cakeType, ingredient):xs) = 
+--     case bakeCake cakeType ingredient of 
+--         Just cake -> cake : bakeCakes xs
+--         Nothing -> bakeCakes xs
+
+-----------------------------------------------
+-- сделано с использованием GPT‑5 mini.
+
+stock :: [Ingredient]
+stock =
+  [ Ingredient Curd 200           -- нужно только для Cheesecake
+  , Ingredient Egg 9              -- 3 + 3 + 3 = 9 яиц на все три торта
+  , Ingredient Flour 320          -- 100 + 100 + 120 = 320
+  , Ingredient Sugar 350          -- 150 + 100 + 100 = 350
+  , Ingredient Cream 100          -- 50 + 50 + 0 = 100
+  , Ingredient Strawberry 150     -- только для Strawberrycake
+  , Ingredient Carrot 200         -- только для Carrotcake
+  , Ingredient Walnut 50          -- только для Carrotcake
+  ]
+
+bakeCake :: CakeType -> [Ingredient] -> Maybe (Cake, [Ingredient])
+bakeCake cakeType stock
+    | canMakeCake need stock = Just (Cake cakeType, useIngredients need stock)
+    | otherwise = Nothing
+  where
+    need = recipe cakeType
+
+-- bakeCakes :: [(CakeType, [Ingredient])] -> [Ingredient] -> ([Cake], [Ingredient])
+-- bakeCakes [] stock = ([], stock)
+-- bakeCakes ((cakeType, _):xs) stock =
+--     case bakeCake cakeType stock of
+--         Just (cake, newStock) ->
+--             let (cakes, finalStock) = bakeCakes xs newStock
+--             in (cake : cakes, finalStock)
+--         Nothing -> bakeCakes xs stock
+
+useIngredients :: [Ingredient] -> [Ingredient] -> [Ingredient]
+useIngredients [] ingredient = ingredient
+useIngredients (x:need) ingredient 
+    | enough x ingredient = useIngredients need updateIngredients
+    | otherwise = ingredient
+        where 
+            updateIngredients = map decrease ingredient
+            decrease (Ingredient ing n) 
+                | ing == ingX = Ingredient ing (n - nX)
+                | otherwise = Ingredient ing n
+            Ingredient ingX nX = x
 -----------------------------------------------
