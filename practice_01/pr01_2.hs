@@ -41,3 +41,11 @@ myReverse :: [a] -> [a]
 myReverse [] = []
 myReverse xs = foldl f [] xs 
     where f acc x =  x : acc
+
+myFoldl1 :: (a -> a -> a) -> [a] -> a
+myFoldl1 _ [x] = x
+myFoldl1 f (x : y : xs) = myFoldl1 f (f x y : xs)
+
+myFoldr1 :: (a -> a -> a) -> [a] -> a
+myFoldr1 _ [x] = x
+myFoldr1 f (x : xs) = f x (myFoldr1 f xs)
