@@ -30,3 +30,9 @@ myZipSave [] ys = ([], [], ys)
 myZipSave xs [] = ([], xs, [])
 myZipSave (x:xs) (y:ys) = ((x,y) : pairs, tailA, tailB)
     where (pairs, tailA, tailB) = myZipSave xs ys
+
+myUnzipSave :: ([(a, b)], [a], [b]) -> ([a], [b]) 
+myUnzipSave ([], [], ys) = ([], ys)
+myUnzipSave ([], xs, []) = (xs, [])
+myUnzipSave ((x, y):pairs, xs, ys) = (x : as, y : bs)
+    where (as, bs) = myUnzipSave (pairs, xs, ys)
