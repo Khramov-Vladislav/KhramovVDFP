@@ -36,3 +36,8 @@ myUnzipSave ([], [], ys) = ([], ys)
 myUnzipSave ([], xs, []) = (xs, [])
 myUnzipSave ((x, y):pairs, xs, ys) = (x : as, y : bs)
     where (as, bs) = myUnzipSave (pairs, xs, ys)
+
+myReverse :: [a] -> [a]
+myReverse [] = []
+myReverse xs = foldl f [] xs 
+    where f acc x =  x : acc
