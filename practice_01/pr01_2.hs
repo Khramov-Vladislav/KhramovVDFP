@@ -24,3 +24,9 @@ module Pr01_2 where
     -- Обработку недостатка или отсутствия ингредиентов
 
 -}
+
+myZipSave :: [a] -> [b] -> ([(a, b)], [a], [b])
+myZipSave [] ys = ([], [], ys)
+myZipSave xs [] = ([], xs, [])
+myZipSave (x:xs) (y:ys) = ((x,y) : pairs, tailA, tailB)
+    where (pairs, tailA, tailB) = myZipSave xs ys
