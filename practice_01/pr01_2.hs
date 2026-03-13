@@ -148,20 +148,13 @@ canMakeCake (x:need) ingredient
 --     | otherwise = Nothing
 --         where  need = recipe cakeType
 
--- bakeCakes :: [(CakeType, [Ingredient])] -> [Cake]
--- bakeCakes [] = []
--- bakeCakes ((cakeType, ingredient):xs) = 
---     case bakeCake cakeType ingredient of 
---         Just cake -> cake : bakeCakes xs
---         Nothing -> bakeCakes xs
-
 -----------------------------------------------
 -- сделано с использованием GPT‑5 mini.
 
 stock :: [Ingredient]
 stock =
   [ Ingredient Curd 200           -- нужно только для Cheesecake
-  , Ingredient Egg 9              -- 3 + 3 + 3 = 9 яиц на все три торта
+  , Ingredient Egg 9              -- 9 яиц на все три торта
   , Ingredient Flour 320          -- 100 + 100 + 120 = 320
   , Ingredient Sugar 350          -- 150 + 100 + 100 = 350
   , Ingredient Cream 100          -- 50 + 50 + 0 = 100
@@ -176,15 +169,6 @@ bakeCake cakeType stock
     | otherwise = Nothing
   where
     need = recipe cakeType
-
--- bakeCakes :: [(CakeType, [Ingredient])] -> [Ingredient] -> ([Cake], [Ingredient])
--- bakeCakes [] stock = ([], stock)
--- bakeCakes ((cakeType, _):xs) stock =
---     case bakeCake cakeType stock of
---         Just (cake, newStock) ->
---             let (cakes, finalStock) = bakeCakes xs newStock
---             in (cake : cakes, finalStock)
---         Nothing -> bakeCakes xs stock
 
 useIngredients :: [Ingredient] -> [Ingredient] -> [Ingredient]
 useIngredients [] ingredient = ingredient
