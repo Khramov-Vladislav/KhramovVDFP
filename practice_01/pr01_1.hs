@@ -28,103 +28,105 @@ module Pr01_1 where
 -- myComposition - композиция двух функций (.)
 
 -}
+
 myFST :: (a, b) -> a
 myFST (a, b) = a
 
 mySND :: (a, b) -> b
 mySND (a, b) = b
 
-myTHRD :: (a, b, c) ->  c
+myTHRD :: (a, b, c) -> c
 myTHRD (a, b, c) = c
 
 myHead :: [a] -> a
 myHead [] = error "empty list"
-myHead (x : xs) = x
+myHead (x:xs) = x
 
 myTail :: [a] -> [a]
 myTail [] = error "empty list"
 myTail (x : xs) = xs
 
 myTake :: Int -> [a] -> [a]
-myTake n [] = []
+myTake _ [] = []
 myTake n (x : xs) = 
-    if n <= 0
-    then []
-    else x : myTake (n-1) xs
+    if n > 0 
+    then x : myTake (n - 1) xs
+    else []
 
 myDrop :: Int -> [a] -> [a]
-myDrop n [] = []
+myDrop _ [] = []
 myDrop n (x : xs) = 
-    if n <= 0
-    then x : xs
-    else myDrop (n-1) xs
+    if n > 0
+    then myDrop (n - 1) xs
+    else x : xs
 
 myProduct :: Num a => [a] -> a
 myProduct [] = 1
 myProduct (x : xs) = x * myProduct xs
 
 myZip :: [a] -> [b] -> [(a, b)]
-myZip [] xs = []
-myZip xs [] = []
+myZip _ [] = []
+myZip [] _ = []
 myZip (x : xs) (y : ys) = (x, y) : myZip xs ys
 
 myZip3 :: [a] -> [b] -> [c] -> [(a, b, c)]
-myZip3 xs ys [] = []
-myZip3 xs [] zs = []
-myZip3 [] ys zs = []
+myZip3 [] _ _ = []
+myZip3 _ [] _ = []
+myZip3 _ _ [] = []
 myZip3 (x : xs) (y : ys) (z : zs) = (x, y, z) : myZip3 xs ys zs
 
---------------------------------------------------------------------
--- сделано с использованием GPT‑5 mini.
 myUnzip :: [(a, b)] -> ([a], [b])
 myUnzip [] = ([], [])
-myUnzip ((a, b):xs) = 
-    let (listA, listB) = myUnzip xs
-    in (a : listA, b : listB)
+myUnzip ((a, b) : xs) = 
+    (a : listA, b : listB)
+    where 
+        (listA, listB) = myUnzip xs
 
-myUnzip' :: [(a,b)] -> ([a],[b]) 
+myUNzip' :: [(a, b)] -> ([a], [b])
+myUNzip' [] = ([], [])
 myUnzip' xs = (map fst xs, map snd xs)
---------------------------------------------------------------------
 
 myFilter :: (a -> Bool) -> [a] -> [a]
 myFilter _ [] = []
-myFilter pred (x : xs ) =
-    if pred x
-    then x : myFilter pred xs
-    else myFilter pred xs
+myFilter pred (x : xs) 
+    | pred x = x : myFilter pred xs
+    | otherwise = myFilter pred xs
 
 myFilter' :: (a -> Bool) -> [a] -> [a]
 myFilter' _ [] = []
-myFilter' pred (x : xs)
-    | pred x = x : myFilter' pred xs 
-    | otherwise = myFilter' pred xs
+myFilter' pred (x : xs) = 
+    if pred x
+    then x : myFilter' pred xs
+    else myFilter' pred xs
 
 myMap :: (a -> b) -> [a] -> [b]
 myMap _ [] = []
-myMap f (x : xs) = f x : myMap f xs
+myMap func (x : xs) = func x : myMap func xs
 
 myZipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
-myZipWith f [] ys = []
-myZipWith f xs [] = []
-myZipWith f (x:xs) (y:ys) = f x y : myZipWith f xs ys 
+myZipWith _ [] _ = []
+myZipWith _ _ [] = []
+myZipWith func (x : xs) (y : ys) = func x y : myZipWith func xs ys
 
 myZipWith3 :: (a -> b -> c -> d) -> [a] -> [b] -> [c] -> [d]
-myZipWith3 f xs ys [] = []
-myZipWith3 f xs [] zs = []
-myZipWith3 f [] ys zs = []
-myZipWith3 f (x:xs) (y:ys) (z:zs) = f x y z : myZipWith3 f xs ys zs
+myZipWith3 _ [] _ _ = []
+myZipWith3 _ _ [] _ = []
+myZipWith3 _ _ _ [] = []
+myZipWith3 func (x : xs) (y : ys) (z : zs) = func x y z : myZipWith3 func xs ys zs
 
 myAll :: (a -> Bool) -> [a] -> Bool
 myAll _ [] = True
-myAll pred (x : xs) 
-    | pred x = myAll pred xs
-    | otherwise = False
+myAll pred (x : xs) = 
+    if pred x
+    then myAll pred xs
+    else False
 
 myAny :: (a -> Bool) -> [a] -> Bool
 myAny _ [] = False
-myAny pred (x : xs)
-    | pred x = True
-    | otherwise  = myAny pred xs
-
+myAny pred (x : xs) = 
+    if pred x
+    then True
+    else myAny pred xs
+    
 myComposition :: (b -> c) -> (a -> b) -> (a -> c)
-myComposition f g x = f (g x)
+myComposition funcF funcG x  = funcF (funcG x) 
