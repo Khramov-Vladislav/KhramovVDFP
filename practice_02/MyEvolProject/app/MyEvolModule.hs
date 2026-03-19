@@ -1,6 +1,4 @@
-module MyEvolutionModule where
-
--- Напишите вручную представителей классов типов: Show, Read, Eq, Ord, Enum, Bounded
+module MyEvolModule where
 
 data MyEvolution = LUCA | Cyanobacteria | Trilobite | Ichthyostega | Dimetrodon | Archaeopteryx | Morganucodon | Purgatorius | Australopithecine | Humans
 
@@ -83,3 +81,6 @@ instance Enum MyEvolution where
 instance Bounded MyEvolution where
     minBound = LUCA
     maxBound = Humans
+
+data MyEvolution' = LUCA' | Cyanobacteria' | Trilobite' | Ichthyostega' | Dimetrodon' | Archaeopteryx' | Morganucodon' | Purgatorius' | Australopithecine' | Humans' 
+    deriving (Show, Read, Eq, Ord, Enum, Bounded)
