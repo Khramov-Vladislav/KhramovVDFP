@@ -28,84 +28,60 @@ module Pr01_2 where
 myZipSave :: [a] -> [b] -> ([(a, b)], [a], [b])
 myZipSave [] ys = ([], [], ys)
 myZipSave xs [] = ([], xs, [])
-myZipSave (x:xs) (y:ys) = ((x,y) : pairs, tailA, tailB)
-    where (pairs, tailA, tailB) = myZipSave xs ys
+myZipSave (x : xs) (y : ys) = ((x, y) : pairs, tailX, tailY) 
+    where (pairs, tailX, tailY) = myZipSave xs ys
 
------------------------------------------------
--- сделано с использованием GPT‑5 mini.
+myUnzipSave :: ([(a, b)], [a], [b]) -> ([a], [b])
+myUnzipSave ([], xs, ys) = (xs, ys)
+myUnzipSave ((a, b) : list, xs, ys) = (a : listA, b : listB) 
+    where (listA, listB) = myUnzipSave (list, xs, ys)
 
-myUnzipSave :: ([(a, b)], [a], [b]) -> ([a], [b]) 
-myUnzipSave ([], [], ys) = ([], ys)
-myUnzipSave ([], xs, []) = (xs, [])
-myUnzipSave ((x, y):pairs, xs, ys) = (x : as, y : bs)
-    where (as, bs) = myUnzipSave (pairs, xs, ys)
------------------------------------------------
+myUnzipSave' :: [(a, b)] -> [a] -> [b] -> ([a], [b])
+myUnzipSave' [] xs ys = (xs, ys)
+myUnzipSave' ((a, b) : list) xs ys = (a : listA, b : listB) 
+    where (listA, listB) = myUnzipSave' list xs ys
 
 myReverse :: [a] -> [a]
 myReverse [] = []
-myReverse xs = foldl f [] xs 
-    where f acc x =  x : acc
+myReverse xs = foldl func [] xs
+    where func acc x  = x : acc
 
 myFoldl1 :: (a -> a -> a) -> [a] -> a
 myFoldl1 _ [x] = x
-myFoldl1 f (x : y : xs) = myFoldl1 f (f x y : xs)
+myFoldl1 func (x : y : xs) = myFoldl1 func (func x y  : xs)
 
 myFoldr1 :: (a -> a -> a) -> [a] -> a
 myFoldr1 _ [x] = x
-myFoldr1 f (x : xs) = f x (myFoldr1 f xs)
-
-myTakeWhile' :: (a -> Bool) -> [a] -> [a]
-myTakeWhile' _ [] = []
-myTakeWhile' f (x : xs) 
-    | f x = x : myTakeWhile' f xs
-    | otherwise = []
+myFoldr1 func (x : xs) = func x (myFoldr1 func xs)
 
 myTakeWhile :: (a -> Bool) -> [a] -> [a]
-myTakeWhile f = foldr step []
-  where
-    step x acc
-      | f x = x : acc
-      | otherwise = []
-
-mySpan' :: (a -> Bool) -> [a] -> ([a], [a])
-mySpan' _ [] = ([], [])
-mySpan' f (x : xs) = (head, tail)
-    where  
-        (head', tail') = mySpan' f xs
-        (head, tail) 
-            | f x = (x : head', tail')
-            | otherwise = ([], x : xs)
-
------------------------------------------------
--- сделано с использованием GPT‑5 mini.
+myTakeWhile pred xs = foldr func [] xs
+  where 
+    func x acc
+        | pred x = x : acc
+        | otherwise = []
 
 mySpan :: (a -> Bool) -> [a] -> ([a], [a])
-mySpan f = foldr step ([], [])
-    where 
-        step x (head, tail)
-            | f x = (x : head, tail)
-            | otherwise = ([], x : head ++ tail)
------------------------------------------------
+mySpan pred xs = foldr func ([], []) xs
+    where func x (listA, listB)
+            | pred x  = (x : listA, listB)
+            | otherwise = ([], x : listA ++ listB)
 
 myMaybe :: b -> (a -> b) -> Maybe a -> b
-myMaybe defVal f Nothing = defVal
-myMaybe defVal f (Just x) = f x
+myMaybe def func (Just x) = func x
+myMaybe def func Nothing = def
 
 data MyList a = MyEmpty | MyCons a (MyList a)
 
 myMap :: (a -> b) -> MyList a -> MyList b
 myMap _ MyEmpty = MyEmpty
-myMap f (MyCons x xs) = MyCons (f x) (myMap f xs)
-
------------------------------------------------
--- сделано с использованием GPT‑5 mini.
+myMap func (MyCons x xs) = MyCons (func x) (myMap func xs)
 
 myUnFoldr :: (b -> Maybe (a, b)) -> b -> [a]
-myUnFoldr f seed =
-    case f seed of
-        Nothing -> []
-        Just (x, newSeed) -> x : myUnFoldr f newSeed
------------------------------------------------
+myUnFoldr func state = case func state of
+    Nothing -> []
+    Just (x, newState) -> x : myUnFoldr func newState
+    
     
 -- Расширьте типы для выпекания тортов из материалов лекции:
 -- Добавить возможность испечь не менее трех типов тортов
