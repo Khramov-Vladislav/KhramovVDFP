@@ -81,74 +81,82 @@ myUnFoldr :: (b -> Maybe (a, b)) -> b -> [a]
 myUnFoldr func state = case func state of
     Nothing -> []
     Just (x, newState) -> x : myUnFoldr func newState
-    
-    
--- Расширьте типы для выпекания тортов из материалов лекции:
--- Добавить возможность испечь не менее трех типов тортов
--- Контроль числа и объема используемых ингредиентов
--- Обработку недостатка или отсутствия ингредиентов
+
+-- Торты
+data Cake = Cake CakeType 
+    deriving Show
 
 data CakeType = Cheesecake | Strawberrycake | Carrotcake 
     deriving Show
 data Ingredients = Oil | Egg | Flour | Sugar | BakingPowder | Curd | Cream | CreamCheese | Strawberry | Carrot | Walnut 
-    deriving (Eq, Show)
-data Ingredient = Ingredient Ingredients Int
-    deriving Show
-data Cake = Cake CakeType 
+    deriving (Show, Eq)
+data Ingredient = Ingredient Ingredients Int 
     deriving Show
 
------------------------------------------------
--- сделано с использованием GPT‑5 mini.
+----------------------------------------
+{-
+    реализовано с испольщованием DeepSeek-V3
+    Промт: 
+    у меня есть некоторые типы, описывающие несколько типов тортов и ингредиенты для них.
+    относительно указанных ингредиентов в типе Ingredients напиши функцию-рецепт для каждого торта 
+
+    data Cake = Cake CakeType deriving Show
+    data CakeType = ChIngredientseesecake | Strawberrycake | Carrotcake deriving Show
+    data  = Oil | Egg | Flour | Sugar | BakingPowder | Curd | Cream | CreamCheese | Strawberry | Carrot | Walnut deriving (Eq)
+    data Ingredient = Ingredient Ingredients Int
+
+    recipe :: CakeType -> [Ingredient]
+-}
+
 recipe :: CakeType -> [Ingredient]
-recipe Cheesecake = [Ingredient Curd 200, Ingredient Egg 3, Ingredient Flour 100, Ingredient Sugar 150, Ingredient Cream 50]
-recipe Strawberrycake = [Ingredient Flour 100, Ingredient Egg 3, Ingredient Sugar 100, Ingredient Strawberry 150, Ingredient Cream 50]
-recipe Carrotcake = [Ingredient Flour 120, Ingredient Egg 3, Ingredient Sugar 100, Ingredient Carrot 200, Ingredient Walnut 50]
------------------------------------------------
+recipe Cheesecake = [Ingredient CreamCheese 500, Ingredient Sugar 150, Ingredient Egg 3, Ingredient Flour 50, Ingredient Cream 200]
+recipe Strawberrycake = [Ingredient Flour 250, Ingredient Sugar 200, Ingredient Egg 4, Ingredient Oil 150, Ingredient BakingPowder 10, Ingredient Strawberry 400, Ingredient Cream 300]
+recipe Carrotcake = [Ingredient Flour 300, Ingredient Sugar 250, Ingredient Egg 3, Ingredient Oil 200, Ingredient BakingPowder 15, Ingredient Carrot 400, Ingredient Walnut 150, Ingredient CreamCheese 250]
+----------------------------------------
 
 enough :: Ingredient -> [Ingredient] -> Bool
 enough _ [] = False
-enough (Ingredient ing1 n1) (Ingredient ing2 n2 : xs) 
-    | ing1 == ing2 && n1 <= n2 = True
-    | otherwise = enough (Ingredient ing1 n1) xs
+enough (Ingredient ing1 q1) (Ingredient ing2 q2 : xs) = 
+    if ing1 == ing2 && q1 <= q2
+    then True
+    else enough (Ingredient ing1 q1) xs
 
 canMakeCake :: [Ingredient] -> [Ingredient] -> Bool
-canMakeCake [] ingredient = True
+canMakeCake [] ing = True
 canMakeCake need [] = False
-canMakeCake (x:need) ingredient
-    | enough x ingredient = canMakeCake need ingredient
-    | otherwise = False
+canMakeCake (x : need) ing = 
+    if enough x ing
+    then canMakeCake need ing
+    else False
 
--- bakeCake :: CakeType -> [Ingredient] -> Maybe Cake
--- bakeCake cakeType ingredient 
---     | canMakeCake need ingredient = Just (Cake cakeType) 
---     | otherwise = Nothing
---         where  need = recipe cakeType
+----------------------------------------
+{-
+    Реализовано с использованием DeepSeek-V3
+    Промт: 
+    нужно реализовать функцию уменьшения количества ингредиентов 
+    useIngredients :: [Ingredient] -> [Ingredient] -> [Ingredient]
 
------------------------------------------------
--- сделано с использованием GPT‑5 mini.
+    уже реализованы функции проверки наличия ингредиента 
+    enough :: Ingredient -> [Ingredient] -> Bool
+    enough _ [] = False
+    enough (Ingredient ing1 q1) (Ingredient ing2 q2 : xs) = 
+        if ing1 == ing2 && q1 <= q2
+        then True
+        else enough (Ingredient ing1 q1) xs
 
-stock :: [Ingredient]
-stock =
-  [ Ingredient Curd 200           -- нужно только для Cheesecake
-  , Ingredient Egg 9              -- 9 яиц на все три торта
-  , Ingredient Flour 320          -- 100 + 100 + 120 = 320
-  , Ingredient Sugar 350          -- 150 + 100 + 100 = 350
-  , Ingredient Cream 100          -- 50 + 50 + 0 = 100
-  , Ingredient Strawberry 150     -- только для Strawberrycake
-  , Ingredient Carrot 200         -- только для Carrotcake
-  , Ingredient Walnut 50          -- только для Carrotcake
-  ]
-
-bakeCake :: CakeType -> [Ingredient] -> Maybe (Cake, [Ingredient])
-bakeCake cakeType stock
-    | canMakeCake need stock = Just (Cake cakeType, useIngredients need stock)
-    | otherwise = Nothing
-  where
-    need = recipe cakeType
+    и функция проверки возможности создания торта 
+    canMakeCake :: [Ingredient] -> [Ingredient] -> Bool
+    canMakeCake [] ing = True
+    canMakeCake need [] = False
+    canMakeCake (x : need) ing = 
+        if enough x ing
+        then canMakeCake need ing
+        else False
+-}
 
 useIngredients :: [Ingredient] -> [Ingredient] -> [Ingredient]
 useIngredients [] ingredient = ingredient
-useIngredients (x:need) ingredient 
+useIngredients (x : need) ingredient 
     | enough x ingredient = useIngredients need updateIngredients
     | otherwise = ingredient
         where 
@@ -157,4 +165,21 @@ useIngredients (x:need) ingredient
                 | ing == ingX = Ingredient ing (n - nX)
                 | otherwise = Ingredient ing n
             Ingredient ingX nX = x
------------------------------------------------
+----------------------------------------
+
+bakeCake :: CakeType -> [Ingredient] -> Maybe (Cake, [Ingredient])
+bakeCake cakeType stock
+    | canMakeCake need stock = Just (Cake cakeType, useIngredients need stock)
+    | otherwise = Nothing
+  where
+    need = recipe cakeType
+
+----------------------------------------
+{-  Реализовано с использованием DeepSeek-V3
+    Промт: 
+    напиши пример для проверки создания торта
+-}
+
+stock :: [Ingredient]
+stock = [Ingredient CreamCheese 600, Ingredient Sugar 300, Ingredient Egg 6, Ingredient Flour 300, Ingredient Cream 300, Ingredient Oil 500, Ingredient BakingPowder 20, Ingredient Strawberry 500, Ingredient Carrot 400, Ingredient Walnut 200]
+----------------------------------------
