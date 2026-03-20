@@ -313,3 +313,4 @@ __pycache__/
 
 lecture*/
 *.pdf
+tmp.hs

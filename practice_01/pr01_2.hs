@@ -3,6 +3,8 @@
 -------------------------------------
 
 module Pr01_2 where
+import Control.Arrow (ArrowChoice(left))
+import Data.Char (GeneralCategory(NotAssigned))
 
 {-
 
@@ -181,5 +183,18 @@ bakeCake cakeType stock
 -}
 
 stock :: [Ingredient]
-stock = [Ingredient CreamCheese 600, Ingredient Sugar 300, Ingredient Egg 6, Ingredient Flour 300, Ingredient Cream 300, Ingredient Oil 500, Ingredient BakingPowder 20, Ingredient Strawberry 500, Ingredient Carrot 400, Ingredient Walnut 200]
+stock = [Ingredient CreamCheese 400, Ingredient Sugar 300, Ingredient Egg 6, Ingredient Flour 300, Ingredient Cream 300, Ingredient Oil 500, Ingredient BakingPowder 20, Ingredient Strawberry 500, Ingredient Carrot 400, Ingredient Walnut 200]
 ----------------------------------------
+
+-- foo (*2) (+1) [(Left 3), (Right 2)] = [(Left 6), (Right 3)]
+
+foo :: Maybe (a -> a) -> Maybe (b -> b) -> [Either a b] -> [Either a b]
+foo Nothing Nothing xs = xs
+foo (Just f) (Just g) ((Left x) : xs) = Left (f x) : foo (Just f) (Just g) xs
+foo (Just f) (Just g) ((Right x) : xs) = Right (g x) : foo (Just f) (Just g) xs
+foo (Just f) Nothing ((Left x) : xs) = Left (f x) : foo (Just f) Nothing xs
+foo Nothing (Just g) ((Right x) : xs) = Right (g x) : foo Nothing (Just g) xs
+foo _ _ [] = []
+
+
+
