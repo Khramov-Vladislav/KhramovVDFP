@@ -19,3 +19,12 @@ instance Functor (MyEither e) where
     fmap :: (a -> b) -> MyEither e a -> MyEither e b
     fmap _ (MyLeft x) = MyLeft x
     fmap g (MyRight y) = MyRight (g y)
+
+instance Foldable (MyEither a) where
+    foldMap _ (MyLeft _) = mempty
+    foldMap f (MyRight y) = f y
+
+    foldr _ z (MyLeft _) = z
+    foldr f z (MyRight y) = f y z
+    
+    
