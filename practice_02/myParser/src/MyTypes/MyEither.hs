@@ -6,7 +6,6 @@ import Data.Functor
 import Data.Foldable 
 import Control.Applicative 
 
--- тип MyEither, аналогичный стандартному Either. Сделайте этот тип представителем классов типов Foldable, Semigroup, Functor и Applicative
 data MyEither a b = MyLeft a | MyRight b deriving(Show, Eq)
 
 instance Semigroup b => Semigroup (MyEither a b) where
@@ -27,4 +26,10 @@ instance Foldable (MyEither a) where
     foldr _ z (MyLeft _) = z
     foldr f z (MyRight y) = f y z
     
+instance Applicative (MyEither a) where
+    pure = MyRight
     
+    (MyLeft x) <*> (MyLeft y) = MyLeft x
+    (MyLeft x) <*> (MyRight y) = MyLeft x
+    (MyRight f) <*> (MyLeft y) = MyLeft y
+    (MyRight f) <*> (MyRight y) = MyRight (f y)
