@@ -15,3 +15,7 @@ instance Semigroup b => Semigroup (MyEither a b) where
     (<>) (MyRight x) (MyLeft y) = MyRight x
     (<>) (MyRight x) (MyRight y) = MyRight (x <> y)
 
+instance Functor (MyEither e) where
+    fmap :: (a -> b) -> MyEither e a -> MyEither e b
+    fmap _ (MyLeft x) = MyLeft x
+    fmap g (MyRight y) = MyRight (g y)
