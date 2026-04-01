@@ -8,3 +8,6 @@ instance Semigroup a => Semigroup (MyMaybe a) where
     (<>) MyNothing (MyJust x)  = MyJust x
     (<>) MyNothing MyNothing = MyNothing
     (<>) (MyJust x) (MyJust y) =  MyJust (x <> y)
+
+instance Monoid a => Monoid (MyMaybe a) where
+  mempty = MyNothing
