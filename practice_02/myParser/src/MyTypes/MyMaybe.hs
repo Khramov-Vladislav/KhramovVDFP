@@ -3,6 +3,8 @@
 import qualified Data.Semigroup
 import qualified Data.Monoid 
 import qualified Data.Functor 
+import qualified Data.Foldable
+import qualified Control.Applicative
 
 data MyMaybe a = MyJust a | MyNothing deriving (Show, Eq)
 
@@ -22,3 +24,9 @@ instance Functor MyMaybe where
 instance Foldable MyMaybe where
     foldr _ z MyNothing = z
     foldr f z (MyJust x) = f x z
+
+instance Applicative MyMaybe where
+    pure = MyJust
+    
+    MyNothing <*> _ = MyNothing
+    (MyJust g) <*> x = fmap g x
