@@ -18,4 +18,7 @@ instance Monoid a => Monoid (MyMaybe a) where
 instance Functor MyMaybe where
     fmap f MyNothing = MyNothing
     fmap f (MyJust x) = MyJust (f x)
-    
+
+instance Foldable MyMaybe where
+    foldr _ z MyNothing = z
+    foldr f z (MyJust x) = f x z
