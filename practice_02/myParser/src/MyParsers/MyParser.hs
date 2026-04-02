@@ -3,7 +3,6 @@ module MyParsers.MyParser where
 import MyTypes.MyMaybe (MyMaybe(..))
 import Data.Char (isLower, isUpper, digitToInt, isDigit)
 
-
 newtype Parser tok a = Parser {runParser :: [tok] -> MyMaybe ([tok], a) }
 
 charA :: Parser Char Char
