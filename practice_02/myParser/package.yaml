@@ -35,6 +35,11 @@ ghc-options:
 
 library:
   source-dirs: src
+  exposed-modules:
+    - Lib
+    - MyTypes.MyMaybe
+    - MyTypes.MyEither
+    - MyTypes.MyTree
 
 executables:
   myParser-exe:

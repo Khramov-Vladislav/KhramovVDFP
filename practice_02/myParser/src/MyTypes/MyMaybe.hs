@@ -1,10 +1,4 @@
-import Data.Semigroup
-import Data.List.NonEmpty
-import Data.Monoid
-import Data.Coerce
-import Data.Functor
-import Data.Foldable 
-import Control.Applicative 
+module MyTypes.MyMaybe (MyMaybe(..)) where
 
 data MyMaybe a = MyJust a | MyNothing deriving (Show, Eq)
 
@@ -18,7 +12,7 @@ instance Semigroup a => Monoid (MyMaybe a) where
   mempty = MyNothing
 
 instance Functor MyMaybe where
-    fmap f MyNothing = MyNothing
+    fmap _ MyNothing = MyNothing
     fmap f (MyJust x) = MyJust (f x)
 
 instance Foldable MyMaybe where
