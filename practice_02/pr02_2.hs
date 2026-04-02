@@ -26,4 +26,3 @@ module Pr02_2 where
 3. Импортируйте модули в Main.hs
 
 -}
-
