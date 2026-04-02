@@ -1,9 +1,3 @@
-module MyParsers.MyParsecParser (runParsecParser, plusOrMultParsec) where
-
-import Text.Parsec
-import Text.Parsec.String (Parser)
-import Data.Char (digitToInt)
-
 -----------------------------------
 {-
     Выполнено с использованием DeepSeek-V3
@@ -89,31 +83,46 @@ import Data.Char (digitToInt)
 -}
 -----------------------------------
 
-digitP :: Parser Int
-digitP = digitToInt <$> oneOf ['0'..'9']
+module MyParsers.MyParsecParser where
 
-digitsP :: Parser Int
-digitsP = fmap (foldl (\acc d -> acc * 10 + d) 0) $ many1 digitP
+import Text.Parsec            (Parsec, (<|>), many, many1, try)
+import Text.Parsec.String     (Parser)  -- Parser String
+import Text.Parsec.Char       (satisfy, char, digit, lower)
+import Data.Char              (digitToInt)
+import Control.Applicative    ((<$>), (<*>), pure, (*>), (<*), some)
+import MyTypes.MyMaybe (MyMaybe(..))
 
-multP :: Parser Int
-multP = do
-    left <- digitsP
-    char '*'
-    right <- digitsP
-    return (left * right)
+type MyParser a = Parser a
 
-plusP :: Parser Int
-plusP = do
-    left <- digitsP
-    char '+'
-    right <- digitsP
-    return (left + right)
+charA :: MyParser Char
+charA = char 'A'
 
-plusOrMultParsec :: Parser Int
-plusOrMultParsec = multP <|> plusP <* eof
+mySatisfy :: (Char -> Bool) -> MyParser Char
+mySatisfy = satisfy
 
-runParsecParser :: String -> Maybe Int
-runParsecParser input =
-    case parse plusOrMultParsec "" input of
-        Left  _ -> Nothing
-        Right x -> Just x
+myChar :: Char -> MyParser Char
+myChar = char
+
+myLower :: MyParser Char
+myLower = lower
+
+myDigit :: MyParser Int
+myDigit = digitToInt <$> satisfy isDigit
+
+multiplication :: MyParser Int
+multiplication = (*) <$> myDigit <* char '*' <*> myDigit
+
+lowers :: MyParser String
+lowers = many myLower  
+
+digits :: MyParser Int
+digits = foldl (\x y -> x*10 + y) 0 <$> some myDigit
+
+finalMult :: MyParser Int
+finalMult = (*) <$> digits <* char '*' <*> digits
+
+finalPlus :: MyParser Int
+finalPlus = (+) <$> digits <* char '+' <*> digits
+
+plusOrMult :: MyParser Int
+plusOrMult = finalMult <|> finalPlus
