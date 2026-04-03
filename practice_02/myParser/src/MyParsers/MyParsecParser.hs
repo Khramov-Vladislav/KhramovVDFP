@@ -83,13 +83,12 @@
 -}
 -----------------------------------
 
-module MyParsers.MyParsecParser where
+module MyParsers.MyParsecParser (runParser, plusOrMultParsec) where
 
-import Text.Parsec            (Parsec, (<|>), many, many1, try)
-import Text.Parsec.String     (Parser)  -- Parser String
-import Text.Parsec.Char       (satisfy, char, digit, lower)
-import Data.Char              (digitToInt)
-import Control.Applicative    ((<$>), (<*>), pure, (*>), (<*), some)
+import Text.Parsec
+import Text.Parsec.String (Parser)
+import Data.Char (digitToInt, isDigit)
+import Control.Applicative ((<$>), (<*>), (*>), (<*), some, many, (<|>))
 import MyTypes.MyMaybe (MyMaybe(..))
 
 type MyParser a = Parser a
@@ -126,3 +125,11 @@ finalPlus = (+) <$> digits <* char '+' <*> digits
 
 plusOrMult :: MyParser Int
 plusOrMult = finalMult <|> finalPlus
+
+plusOrMultParsec :: Parser Int
+plusOrMultParsec = plusOrMult
+
+runParser :: Parser a -> String -> MyMaybe (String, a)
+runParser p input = case parse (do x <- p; rest <- getInput; return (rest, x)) "" input of
+    Left _  -> MyNothing
+    Right (rest, x) -> MyJust (rest, x)

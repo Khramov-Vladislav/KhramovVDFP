@@ -1,8 +1,8 @@
-module MyParsers.MyParser where
+module MyParsers.MyParser (runParser, plusOrMult) where
 
 import MyTypes.MyMaybe (MyMaybe(..))
-
 import Data.Char (isLower, isUpper, digitToInt, isDigit)
+import Control.Applicative (some, many) 
 
 newtype Parser tok a = Parser {runParser :: [tok] -> MyMaybe ([tok], a) }
 
