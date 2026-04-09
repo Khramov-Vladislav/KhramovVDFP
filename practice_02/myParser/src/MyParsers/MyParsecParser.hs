@@ -85,37 +85,18 @@
 
 module MyParsers.MyParsecParser (runParser, plusOrMultParsec) where
 
-import Text.Parsec
+import Text.Parsec hiding (runParser)   
 import Text.Parsec.String (Parser)
 import Data.Char (digitToInt, isDigit)
-import Control.Applicative ((<$>), (<*>), (*>), (<*), some, many, (<|>))
 import MyTypes.MyMaybe (MyMaybe(..))
 
 type MyParser a = Parser a
 
-charA :: MyParser Char
-charA = char 'A'
-
-mySatisfy :: (Char -> Bool) -> MyParser Char
-mySatisfy = satisfy
-
-myChar :: Char -> MyParser Char
-myChar = char
-
-myLower :: MyParser Char
-myLower = lower
-
 myDigit :: MyParser Int
 myDigit = digitToInt <$> satisfy isDigit
 
-multiplication :: MyParser Int
-multiplication = (*) <$> myDigit <* char '*' <*> myDigit
-
-lowers :: MyParser String
-lowers = many myLower  
-
 digits :: MyParser Int
-digits = foldl (\x y -> x*10 + y) 0 <$> some myDigit
+digits = foldl (\x y -> x*10 + y) 0 <$> many1 myDigit
 
 finalMult :: MyParser Int
 finalMult = (*) <$> digits <* char '*' <*> digits
@@ -130,6 +111,7 @@ plusOrMultParsec :: Parser Int
 plusOrMultParsec = plusOrMult
 
 runParser :: Parser a -> String -> MyMaybe (String, a)
-runParser p input = case parse (do x <- p; rest <- getInput; return (rest, x)) "" input of
-    Left _  -> MyNothing
-    Right (rest, x) -> MyJust (rest, x)
+runParser p input =
+    case parse ((\x rest -> (rest, x)) <$> p <*> getInput) "" input of
+        Left _  -> MyNothing
+        Right r -> MyJust r

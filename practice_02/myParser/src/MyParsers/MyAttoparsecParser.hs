@@ -82,52 +82,36 @@
     plusOrMult = finalMult <|> finalPlus
 -}
 -----------------------------------
-
 module MyParsers.MyAttoparsecParser (runParser, plusOrMultAttoparsec) where
 
 import Data.Attoparsec.Text
 import Data.Text (pack, unpack)
-import Data.Char (isLower, isDigit, digitToInt)
-import Control.Applicative ((<$>), (<*>), (*>), (<*), many, some, (<|>))
+import Data.Char (isDigit, digitToInt)
+import Control.Applicative ((<|>), some)
 import MyTypes.MyMaybe (MyMaybe(..))
 
-charA :: Parser Char
-charA = char 'A'
+type MyParser a = Parser a
 
-mySatisfy :: (Char -> Bool) -> Parser Char
-mySatisfy = satisfy
-
-myChar :: Char -> Parser Char
-myChar = char
-
-myLower :: Parser Char
-myLower = satisfy isLower
-
-myDigit :: Parser Int
+myDigit :: MyParser Int
 myDigit = digitToInt <$> satisfy isDigit
 
-multiplication :: Parser Int
-multiplication = (*) <$> myDigit <* char '*' <*> myDigit
-
-lowers :: Parser String
-lowers = many myLower
-
-digits :: Parser Int
+digits :: MyParser Int
 digits = foldl (\x y -> x*10 + y) 0 <$> some myDigit
 
-finalMult :: Parser Int
+finalMult :: MyParser Int
 finalMult = (*) <$> digits <* char '*' <*> digits
 
-finalPlus :: Parser Int
+finalPlus :: MyParser Int
 finalPlus = (+) <$> digits <* char '+' <*> digits
 
-plusOrMult :: Parser Int
+plusOrMult :: MyParser Int
 plusOrMult = finalMult <|> finalPlus
 
 plusOrMultAttoparsec :: Parser Int
 plusOrMultAttoparsec = plusOrMult
 
 runParser :: Parser a -> String -> MyMaybe (String, a)
-runParser p input = case parse (do x <- p; rest <- takeText; return (unpack rest, x)) (pack input) of
-    Fail {} -> MyNothing
-    Done _ (rest, x) -> MyJust (rest, x)
+runParser p input =
+    case parseOnly ( (,) <$> p <*> takeText ) (pack input) of
+        Left _               -> MyNothing
+        Right (val, rest)    -> MyJust (unpack rest, val)

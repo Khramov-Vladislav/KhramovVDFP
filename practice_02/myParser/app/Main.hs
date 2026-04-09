@@ -1,16 +1,20 @@
+module Main(main) where
+
+-- import MyTypes.MyMaybe
+-- import MyTypes.MyEither
+-- import MyTypes.MyTree
+
+import qualified MyParsers.MyParser as MP
+import qualified MyParsers.MyParsecParser as MPP
+import qualified MyParsers.MyAttoparsecParser as MAP
+
 ----------------------------------------------
 {-
     Выполнено с использованием DeepSeek-V3
 
     Промт:
-    мне нужно импортировать модули MyMaybe, MyEither и MyTree в main. приведи пример реализации main функции, чтобы не было imports без использования
+    мне нужно импортировать модули MyMaybe, MyEither и MyTree в main. приведи пример реализации main функции, чтобы все imports использовались
 -}
-
--- module Main (main) where
-
--- import MyTypes.MyMaybe
--- import MyTypes.MyEither
--- import MyTypes.MyTree
 
 -- main :: IO ()
 -- main = do
@@ -27,12 +31,6 @@
 --     putStrLn "Модули MyMaybe, MyEither, MyTree успешно импортированы и использованы."
 
 ----------------------------------------------
-
-module Main where
-
-import qualified MyParsers.MyParser as MP
-import qualified MyParsers.MyParsecParser as MPP
-import qualified MyParsers.MyAttoparsecParser as MAP
 
 main :: IO ()
 main = do

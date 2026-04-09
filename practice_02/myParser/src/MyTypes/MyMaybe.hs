@@ -8,7 +8,7 @@ instance Semigroup a => Semigroup (MyMaybe a) where
     (<>) MyNothing MyNothing = MyNothing
     (<>) (MyJust x) (MyJust y) =  MyJust (x <> y)
 
-instance Semigroup a => Monoid (MyMaybe a) where
+instance Monoid a => Monoid (MyMaybe a) where
   mempty = MyNothing
 
 instance Functor MyMaybe where

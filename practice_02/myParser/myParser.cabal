@@ -29,10 +29,10 @@ library
       MyTypes.MyMaybe
       MyTypes.MyEither
       MyTypes.MyTree
-  other-modules:
-      MyParsers.MyAttoparsecParser
-      MyParsers.MyParsecParser
       MyParsers.MyParser
+      MyParsers.MyParsecParser
+      MyParsers.MyAttoparsecParser
+  other-modules:
       Paths_myParser
   autogen-modules:
       Paths_myParser
