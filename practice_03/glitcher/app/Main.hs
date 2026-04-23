@@ -1,46 +1,63 @@
-module Main (main) where 
-
 import System.Environment (getArgs)
-import System.Exit (exitFailure)
-import System.FilePath (takeBaseName)
-import Control.Monad (foldM)  
+import System.Random (randomRIO)
 import qualified Data.ByteString.Char8 as BC
-import Glitcher.Effects (randomReplaceByte, randomSortSection)
+import Control.Monad (foldM)
+import Glitcher (replaceByte, sortSection)
+
+randomReplaceByte :: BC.ByteString -> IO BC.ByteString
+randomReplaceByte bytes = do
+    let bytesLength = BC.length bytes
+    if bytesLength == 0
+        then return bytes
+        else do
+            location <- randomRIO (1, bytesLength)
+            chV <- randomRIO (0, 255)
+            return (replaceByte location chV bytes)
+
+randomSortSection :: BC.ByteString -> IO BC.ByteString
+randomSortSection bytes = do
+    let sectionSize = 25
+    let bytesLength = BC.length bytes
+    if bytesLength < sectionSize
+        then return bytes
+        else do
+            start <- randomRIO (0, bytesLength - sectionSize)
+            return (sortSection start sectionSize bytes)
 
 glitchActions :: [BC.ByteString -> IO BC.ByteString]
 glitchActions =
-    [ randomReplaceByte
-    , randomSortSection
-    , randomReplaceByte
-    , randomSortSection
-    , randomReplaceByte
-    ]
+  [ randomReplaceByte
+  , randomSortSection
+  , randomReplaceByte
+  , randomSortSection
+  , randomReplaceByte
+  ]
 
-saveStep :: String -> String -> BC.ByteString -> IO ()
-saveStep baseName suffix content = do
-    let fileName = "glitched_" ++ baseName ++ "_" ++ suffix ++ ".jpg"
-    BC.writeFile fileName content
-    putStrLn $ "Saved: " ++ fileName
+takeBaseName :: String -> String
+takeBaseName = takeWhile (/= '.')
+
+takeExtension :: String -> String
+takeExtension = dropWhile (/= '.')
 
 main :: IO ()
 main = do
     args <- getArgs
     case args of
-        [] -> do
-            putStrLn "Usage: glitcher <image-file>"
-            exitFailure
+        [] -> putStrLn "Usage: glitcher <filename>"
         (fileName:_) -> do
-            let baseName = takeBaseName fileName
+            let base = takeBaseName fileName
+                ext  = takeExtension fileName
+
             imageFile <- BC.readFile fileName
-            putStrLn $ "Loaded: " ++ fileName
 
-            let steps = zip glitchActions ([1..] :: [Int])
-            final <- foldM (\current (action, stepNum) -> do
-                                new <- action current
-                                saveStep baseName (show stepNum) new
-                                return new
-                          ) imageFile steps
+            _ <- foldM
+                  (\(step, bytes) action -> do
+                      newBytes <- action bytes
+                      let outName = "glitched_" ++ show (step :: Int) ++ "_" ++ base ++ ext
+                      BC.writeFile outName newBytes
+                      putStrLn $ "Saved: " ++ outName
+                      return (step + 1, newBytes))
+                  (1 :: Int, imageFile)
+                  glitchActions
 
-            let finalName = "glitched_" ++ fileName
-            BC.writeFile finalName final
-            putStrLn $ "Final image saved as: " ++ finalName
+            putStrLn "All done!"
