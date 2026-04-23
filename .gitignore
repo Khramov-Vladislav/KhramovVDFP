@@ -285,7 +285,6 @@ __pycache__/
 
 # Файлы образов и медиа
 *.png
-*.jpg
 *.jpeg
 *.gif
 *.bmp
