@@ -1,9 +1,4 @@
-module Glitcher
-  ( intToChar
-  , intToBC
-  , replaceByte
-  , sortSection
-  ) where
+module Glitcher(intToChar, intToBC, replaceByte, sortSection) where
 
 import qualified Data.ByteString.Char8 as BC
 

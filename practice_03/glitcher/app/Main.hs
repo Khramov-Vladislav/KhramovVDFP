@@ -10,7 +10,7 @@ randomReplaceByte bytes = do
     if bytesLength == 0
         then return bytes
         else do
-            location <- randomRIO (1, bytesLength)
+            location <- randomRIO (0, bytesLength - 1)
             chV <- randomRIO (0, 255)
             return (replaceByte location chV bytes)
 
@@ -25,13 +25,7 @@ randomSortSection bytes = do
             return (sortSection start sectionSize bytes)
 
 glitchActions :: [BC.ByteString -> IO BC.ByteString]
-glitchActions =
-  [ randomReplaceByte
-  , randomSortSection
-  , randomReplaceByte
-  , randomSortSection
-  , randomReplaceByte
-  ]
+glitchActions = [randomReplaceByte, randomSortSection, randomReplaceByte, randomSortSection, randomReplaceByte]
 
 takeBaseName :: String -> String
 takeBaseName = takeWhile (/= '.')
@@ -51,9 +45,9 @@ main = do
             imageFile <- BC.readFile fileName
 
             _ <- foldM
-                  (\(step, bytes) action -> do
-                      newBytes <- action bytes
-                      let outName = "glitched_" ++ show (step :: Int) ++ "_" ++ base ++ ext
+                  (\(step, prevBytes) action -> do
+                      newBytes <- action prevBytes
+                      let outName = "glitched_" ++ show step ++ "_" ++ base ++ ext
                       BC.writeFile outName newBytes
                       putStrLn $ "Saved: " ++ outName
                       return (step + 1, newBytes))
@@ -61,14 +55,15 @@ main = do
                   glitchActions
 
             putStrLn "All done!"
-
 {-
     Работа выполнена с использованием DeepSeek-V3
 
     Промт:
+    1)
         - Создайте проект по генерации глитчей на изображениях согласно Уроку 25.2 из "Программируй на HASKELL" Уилл Курт
         - Вынесите все чистые функции в src.
         - Сохраните отдельную версию файла для каждого изменения изображения
         проект создай в stack, код должен быть взят из книги (файлы книги были приложены к запросу)
-        ошибки про сборке и запуске, нужно убрать warnings
+     
+    2) ошибки пр сборке и запуске, нужно убрать warnings
 -}
