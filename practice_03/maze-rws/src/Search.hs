@@ -1,4 +1,4 @@
-module Search where
+module Search (runSearch) where
 
 import Types
 import Control.Monad.RWS
@@ -11,21 +11,21 @@ search :: Room -> MazeRWS (Maybe [Room])
 search current =
     get >>= \visited ->
     if S.member current visited
-    then return Nothing
-    else
-        modify (S.insert current) >>
-        tell ["Переход в: " ++ current] >>
-        if current == "финиш"
-        then return (Just [current])
+        then return Nothing
         else
-            ask >>= \maze ->
-            case M.lookup current maze of
-                Nothing -> return Nothing
-                Just nextRooms ->
-                    searchList nextRooms >>= \res ->
-                    case res of
+            modify (S.insert current) >>
+            tell ["Переход в: " ++ current] >>
+            if current == "финиш"
+                then return (Just [current])
+                else
+                    ask >>= \maze ->
+                    case M.lookup current maze of
                         Nothing -> return Nothing
-                        Just path -> return (Just (current:path))
+                        Just nextRooms ->
+                            searchList nextRooms >>= \res ->
+                            case res of
+                                Nothing -> return Nothing
+                                Just path -> return (Just (current:path))
 
 searchList :: [Room] -> MazeRWS (Maybe [Room])
 searchList [] = return Nothing
@@ -37,5 +37,5 @@ searchList (x:xs) =
 
 runSearch :: Maze -> (Maybe [Room], Log)
 runSearch maze =
-    let (result, _, log) = runRWS (search "старт") maze S.empty
-    in (result, log)
+    let (result, _, logs) = runRWS (search "старт") maze S.empty
+    in (result, logs)

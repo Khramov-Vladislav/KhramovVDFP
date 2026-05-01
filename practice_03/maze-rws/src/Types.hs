@@ -1,4 +1,4 @@
-module Types where
+module Types (Room, Maze, Log, Visited) where
 
 import qualified Data.Map as M
 import qualified Data.Set as S
