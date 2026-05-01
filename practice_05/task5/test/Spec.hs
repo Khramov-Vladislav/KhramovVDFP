@@ -1,47 +1,25 @@
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module Main (main) where
+
 import Test.QuickCheck
 import Lib (addMod, reverseWords)
 
 -- ------------------------------------------------------------
--- Генераторы для «содержательных» данных
+-- Генераторы для слов и предложений
 -- ------------------------------------------------------------
-
--- Модуль должен быть положительным
-genPositive :: Gen Int
-genPositive = getPositive <$> arbitrary
-
--- Генератор для (x, y, m) с m > 0
-instance Arbitrary (Int, Int, Int) where
-  arbitrary = do
-    m <- genPositive
-    x <- choose (0, m-1)  -- чтобы тестировать в пределах модуля
-    y <- choose (0, m-1)
-    return (x, y, m)
-  shrink (x, y, m) = [(x', y', m) | x' <- shrink x, y' <- shrink y, x' >=0, y' >=0, m>0]
-
--- Генератор для строк с несколькими словами (без лишних пробелов)
 genWord :: Gen String
 genWord = listOf1 $ elements (['a'..'z'] ++ ['A'..'Z'])
 
 genSentence :: Gen String
 genSentence = do
-  wordsCount <- choose (0, 10)
-  words <- vectorOf wordsCount genWord
-  return $ unwords words
-
-instance Arbitrary String where
-  arbitrary = genSentence
-  shrink s = [ unwords (drop i ws) | i <- [1..length ws] ] ++
-             [ unwords (take i ws) | i <- [0..length ws-1] ]
-    where ws = words s
+  n <- choose (0, 10)
+  ws <- vectorOf n genWord
+  return $ unwords ws
 
 -- ------------------------------------------------------------
 -- Свойства для addMod
 -- ------------------------------------------------------------
-
 prop_addMod_mod :: Int -> Int -> Int -> Property
 prop_addMod_mod x y m = m > 0 ==> addMod x y m === (x + y) `mod` m
 
@@ -54,25 +32,23 @@ prop_addMod_commutative x y m = m > 0 ==> addMod x y m === addMod y x m
 -- ------------------------------------------------------------
 -- Свойства для reverseWords
 -- ------------------------------------------------------------
-
 prop_reverseWords_empty :: Property
 prop_reverseWords_empty = reverseWords "" === ""
 
-prop_reverseWords_single :: String -> Property
-prop_reverseWords_single s = not (any (==' ') s) && s /= "" ==> reverseWords s === s
+prop_reverseWords_single :: Property
+prop_reverseWords_single = forAll genWord $ \w -> reverseWords w === w
 
-prop_reverseWords_multiple :: String -> Property
-prop_reverseWords_multiple s = length (words s) > 1 ==> 
-  let ws = words s
-  in reverseWords s === unwords (reverse ws)
+prop_reverseWords_multiple :: Property
+prop_reverseWords_multiple = forAll (suchThat genSentence ((>1) . length . words)) $ \s ->
+  let ws = words s in reverseWords s === unwords (reverse ws)
 
-prop_reverseWords_involution :: String -> Property
-prop_reverseWords_involution s = reverseWords (reverseWords s) === s
+prop_reverseWords_involution :: Property
+prop_reverseWords_involution = forAll genSentence $ \s ->
+  reverseWords (reverseWords s) === s
 
 -- ------------------------------------------------------------
 -- Запуск тестов
 -- ------------------------------------------------------------
-
 main :: IO ()
 main = do
   putStrLn "Testing addMod..."
