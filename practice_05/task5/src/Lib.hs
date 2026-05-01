@@ -1,4 +1,4 @@
-module MyLib (addMod, reverseWords) where
+module Lib (addMod, reverseWords) where
 
 -- | Сложение по модулю: (x + y) `mod` m
 addMod :: Int -> Int -> Int -> Int

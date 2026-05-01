@@ -1,8 +1,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
+module Main (main) where
 import Test.QuickCheck
-import MyLib (addMod, reverseWords)
+import Lib (addMod, reverseWords)
 
 -- ------------------------------------------------------------
 -- Генераторы для «содержательных» данных
