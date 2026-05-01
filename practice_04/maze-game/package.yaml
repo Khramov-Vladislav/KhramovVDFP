@@ -35,6 +35,14 @@ ghc-options:
 
 library:
   source-dirs: src
+  exposed-modules:
+    - MyStateT
+    - Game
+  dependencies:
+    - base
+    - containers
+    - mtl
+    - transformers
 
 executables:
   maze-game-exe:
