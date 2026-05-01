@@ -1,6 +1,9 @@
-module Lib
-    ( someFunc
-    ) where
+module MyLib (addMod, reverseWords) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+-- | Сложение по модулю: (x + y) `mod` m
+addMod :: Int -> Int -> Int -> Int
+addMod x y m = (x + y) `mod` m
+
+-- | Переворачивает порядок слов (слова разделены пробелами)
+reverseWords :: String -> String
+reverseWords = unwords . reverse . words
